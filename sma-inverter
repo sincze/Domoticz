@@ -1,0 +1,120 @@
+#!/usr/bin/php
+<?PHP
+
+/**
+ * Pass2PHP
+ * php version 7.0
+ *
+ * @category Home_Automation
+ * @package  Pass2PHP FULL script for SMA Inverter (Sunnyportal), needs to be used with regular Pass2PHP
+ * @author   Sándor Incze
+ * @license  GNU GPLv3
+ * @link     https://github.com/sincze/Domoticz
+ **/
+
+define('rootdir','/var/www/html/secure2/');
+
+if(isset($_REQUEST['text'])){ retrieve_sma_data($_REQUEST['text']); }
+
+function retrieve_sma_data($command)
+{
+	define('USERNAME', '');					//The username or email address of the account.
+	define('PASSWORD', '');					//The password of the account.
+	define('DOMOTICZDEVICE', '');		//Device name or IDX of Domoticz device.
+	define('USER_AGENT', 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.2309.372 Safari/537.36');			//Set a user agent. This basically tells the server that we are using Chrome ;)
+	define('COOKIE_FILE', 'sunnyportal.cookies');	//Where our cookie information will be stored (needed for authentication).
+	define('LOGIN_FORM_URL', 'http://www.sunnyportal.com/Templates/Start.aspx?logout=true');			//URL of the login form.
+	define('LOGIN_ACTION_URL', 'https://www.sunnyportal.com/Templates/Start.aspx?logout=true');		//Login action URL. Sometimes, this is the same URL as the login form.
+	$continue=true;
+
+	$postValues = array(
+	'__EVENTTARGET'	=> '',
+	'__EVENTARGUMENT' => '',
+	'__VIEWSTATE' => '',
+	'ctl00$ContentPlaceHolder1$Logincontrol1$txtUserName'	=> USERNAME,
+	'ctl00$ContentPlaceHolder1$Logincontrol1$txtPassword'	=> PASSWORD,
+	'ctl00$ContentPlaceHolder1$Logincontrol1$LoginBtn'	=>  'Login',
+	'ctl00$ContentPlaceHolder1$hiddenLanguage' => 'en-us'
+	);
+
+	$curl = curl_init();
+	
+	curl_setopt($curl, CURLOPT_URL, LOGIN_ACTION_URL);				// Set the URL that we want to send our POST request to. In this	case, it's the action URL of the login form.
+	curl_setopt($curl, CURLOPT_POST, true);										// Tell cURL that we want to carry out a POST request.
+	//curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+	curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($postValues));		//Set our post fields / date (from the array above). 
+	curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);				// We don't want any HTTPS errors.
+	curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);				// We don't want any HTTPS errors.
+	curl_setopt($curl, CURLOPT_COOKIEJAR, COOKIE_FILE);				// Where our cookie details are saved. This is typically required for authentication, as the session ID is usually saved in the cookie file.
+	curl_setopt($curl, CURLOPT_COOKIEFILE, COOKIE_FILE); 
+	curl_setopt($curl, CURLOPT_USERAGENT, USER_AGENT);				// Sets the user agent. Some websites will attempt to block bot user agents. //Hence the reason I gave it a Chrome user agent.
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);					// Tells cURL to return the output once the request has been executed.
+	curl_setopt($curl, CURLOPT_REFERER, LOGIN_FORM_URL);			// Allows us to set the referer header. In this particular case, we are fooling the server into thinking that we were referred by the login form.
+	curl_setopt ($curl, CURLOPT_SSLVERSION, 1);
+	curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);					// Do we want to follow any redirects?
+	curl_exec($curl);																					// Execute the login request.
+	 
+
+	//Check for errors!
+	if(curl_errno($curl)){
+		switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
+ 			case 200:   $continue=true;# OK
+ 	    				lg('SMAinverter: Login: Expected HTTP code: ', $http_code);
+        				break;
+			case 302:   $continue=true;# OK
+ 	    				lg('SMAinverter: Login: Expected HTTP code: ', $http_code);
+        				break;        				
+        	default:    $continue=false;
+        				lg('SMAinverter: Login: Unexpected HTTP code: ', $http_code);
+		}
+	}
+
+
+	if ($continue) {
+
+		$url='https://www.sunnyportal.com/Dashboard?t='.time();
+
+		curl_setopt($curl, CURLOPT_URL, $url);							// We should be logged in by now. Let's attempt to access a password protected page
+		curl_setopt($curl, CURLOPT_COOKIEJAR, COOKIE_FILE);	// Use the same cookie file.
+		curl_setopt($curl, CURLOPT_USERAGENT, USER_AGENT);	// Use the same user agent, just in case it is used by the server for session validation.
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);			// We don't want any HTTPS / SSL errors.
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);			// We don't want any HTTPS / SSL errors.
+		curl_setopt ($curl, CURLOPT_SSLVERSION, 1);
+		$result = curl_exec($curl);													// Execute the GET request and print out the result.
+		
+		if(curl_errno($curl)){
+			switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
+ 				case 200:   $continue=true;# OK
+ 	    					lg('SMAinverter: Data: Expected HTTP code: ', $http_code);
+        					break;
+				case 302:   $continue=true;# OK
+ 	    					lg('SMAinverter: Data: Expected HTTP code: ', $http_code);
+        					break;        				
+        		default:    $continue=false;
+        					lg('SMAinverter: Data: Unexpected HTTP code: ', $http_code);
+			}
+		}	
+
+		if ($continue) {
+
+			$data = json_decode($result, JSON_PRETTY_PRINT);
+			$nowpower = $data['PV'];
+
+			if (is_int($nowpower))
+			{
+				$str=( round($nowpower).';'.'0' );
+				lg('SMAinverter: '. round($nowpower).' for domoticz: '.$str);
+				ud(DOMOTICZDEVICE,0,$str,'SMAinverter: Generation updated');				
+			}
+			else
+			{
+				$str=( '0'.';'.'0' );
+				lg('SMAinverter: '. round($nowpower).' Backup for domoticz: '.$str);
+				ud(DOMOTICZDEVICE,0,$str,'SMAinverter: Generation updated');					
+			}
+		}
+	}
+	curl_close($curl);														// close cURL resource, and free up system resources
+}
+
+?>
