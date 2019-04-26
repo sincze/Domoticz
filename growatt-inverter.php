@@ -34,7 +34,7 @@
 // If device is updated continue.
 
 // $ sudo nano /etc/crontab
-// add line: */5 * * * *   root    php /home/pi/domoticz/scripts/pass2phps/growatt-inverter.php >/dev/null 2>&1  
+// add line: */5 * * * *   root    php /home/pi/domoticz/scripts/pass2php/growatt-inverter.php >/dev/null 2>&1  
 
 error_reporting(E_ALL);						
 ini_set("display_errors","on");				
