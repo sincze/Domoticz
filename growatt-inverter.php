@@ -17,7 +17,7 @@
 // $ cd /home/pi/domoticz/scripts
 // $ mkdir pass2php
 // $ cd pass2php
-// $ wget https://github.com/sincze/Domoticz/blob/master/growatt-inverter.php
+// $ Add the downloaded RAW file here
 
 // In Domoticz:
 // Create Virtual Sensor -> Electric (instant+Counter)
