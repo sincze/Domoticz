@@ -25,11 +25,11 @@
 // Modify **** to your username  line 44
 // Modify **** to your password  line 45
 // Modify DOMOTICZDEVICE **** to your IDX  line 49
-// In terminal execute 'php /home/pi/domoticz/scripts/pass2php/growatt-inverter.php'
+// In terminal execute 'php /home/pi/domoticz/scripts/pass2php/goodwe-inverter.php'
 // No errors should be seen, check domoticz created virtual sensor device & log for errors.
 // If device is updated continue.
 // $ sudo nano /etc/crontab
-// add line: */5 * * * *   root    php /home/pi/domoticz/scripts/pass2php/growatt-inverter.php >/dev/null 2>&1  
+// add line: */5 * * * *   root    php /home/pi/domoticz/scripts/pass2php/goodwe-inverter.php >/dev/null 2>&1  
 
 error_reporting(E_ALL);				      // 14-04-2019 Pass2PHP 3.0
 ini_set("display_errors","on");			// 14-04-2019 Pass2PHP 3.0
