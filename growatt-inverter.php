@@ -129,13 +129,10 @@ function retrieve_growatt_data($command)
 		if ($continue) {
 
 			$data = json_decode($result, JSON_PRETTY_PRINT);
-			$nowpower = $data['powerValue'];
-			$todaypower = $data['todayStr'];
-
-			$nowpower=filter_var($nowpower,FILTER_SANITIZE_NUMBER_INT)/10;
-			$todaypower=filter_var($todaypower,FILTER_SANITIZE_NUMBER_INT);
+			$nowpower = (float)str_ireplace('kWh', '', $data['powerValue']);
+			$todaypower = (float)str_ireplace('kWh', '', $data['todayStr']);
 			
-			$str=( $nowpower.';'. $todaypower*100 );			
+			$str=( $nowpower.';'. $todaypower * 1000 );	#times 1000 to convert the 0.1kWh to 100 WattHour and to convert 2.1kWh to 2100 WattHour
 			lg('Growatt Inverter: '. $nowpower.' for domoticz: '.$str);
 			ud(DOMOTICZDEVICE,0,$str,'GrowattInverter: Generation updated');
 		}
