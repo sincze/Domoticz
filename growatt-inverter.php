@@ -52,11 +52,11 @@ function retrieve_growatt_data($command)
 								//replace leading 0 by c for Growatt
 	for ($i = 0; $i < strlen($pw); $i=$i+2){
 		if ($pw[$i]=='0')
-        {
+        	{
                    $pw=substr_replace($pw,'c',$i,1);
-
-        }
+	        }
 	}
+	
 	define('USER_AGENT', 'Dalvik/2.1.0 (Linux; U; Android 9; ONEPLUS A6003 Build/PKQ1.180716.001)');	// Set a user agent. 
 	define('COOKIE_FILE','/home/pi/domoticz/scripts/pass2php/growatt.cookie');							// Where our cookie information will be stored (need to be writable!)
 	define('HEADER',array('Content-Type: application/x-www-form-urlencoded;charset=UTF-8'));
