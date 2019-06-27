@@ -47,9 +47,8 @@ retrieve_growatt_data('test');
 function retrieve_growatt_data($command)
 {
 	define('USERNAME', '*****');																		// The username or email address of the account.
-	define('PASSWORD', md5('*****'));// The Password of the account
-	$pw =  md5(PASSWORD);
-
+	define('PASSWORD', '*****');// The Password of the account
+	$pw =  md5(PASSWORD);					// No Need to double md5
 								//replace leading 0 by c for Growatt
 	for ($i = 0; $i < strlen($pw); $i=$i+2){
 		if ($pw[$i]=='0')
