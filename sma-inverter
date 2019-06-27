@@ -21,7 +21,8 @@ function retrieve_sma_data($command)
 	define('USERNAME', '');					//The username or email address of the account.
 	define('PASSWORD', '');					//The password of the account.
 	define('DOMOTICZDEVICE', '');		//Device name or IDX of Domoticz device.
-	define('USER_AGENT', 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.2309.372 Safari/537.36');			//Set a user agent. This basically tells the server that we are using Chrome ;)
+	//define('USER_AGENT', 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.2309.372 Safari/537.36');			//Set a user agent. This basically tells the server that we are using Chrome ;)
+	define('USER_AGENT', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36');
 	define('COOKIE_FILE', 'sunnyportal.cookies');	//Where our cookie information will be stored (needed for authentication).
 	define('LOGIN_FORM_URL', 'http://www.sunnyportal.com/Templates/Start.aspx?logout=true');			//URL of the login form.
 	define('LOGIN_ACTION_URL', 'https://www.sunnyportal.com/Templates/Start.aspx?logout=true');		//Login action URL. Sometimes, this is the same URL as the login form.
