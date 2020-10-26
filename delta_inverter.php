@@ -166,7 +166,8 @@ function retrieve_Delta_data($command)
 
 			$data=extract_data($result);
 			if ($result!=false) {
-				$str=( $data['current_watt'].';'. $data['today_power']*1000 );
+				//$str=( $data['current_watt'].';'. $data['today_power']*1000 );
+				$str=( $data['current_watt'].';'. $data['today_power'] );  // JSON already resuls in WH
 				lg('Delta Inverter: '. $data['current_watt'].' for domoticz: '.$str);
 				print('Delta Inverter: '. $data['current_watt'].' for domoticz: '.$str);
 				ud(DOMOTICZDEVICE,0,$str);	
