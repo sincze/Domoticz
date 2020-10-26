@@ -44,12 +44,12 @@ retrieve_Delta_data('test');
 
 function retrieve_Delta_data($command)
 {
-	define('USERNAME', 'USERNAME');
-	define('PASSWORD', 'PASSWORD');
+	define('USERNAME', '****');
+	define('PASSWORD', '****');
 	define('USER_AGENT', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36');		//Set a user agent. 
 	define('COOKIE_FILE','/var/tmp/snapshots/Delta.cookie');													//Where our cookie information will be stored (need to be writable!)
 		
-	define('DOMOTICZDEVICE', 'IDX');																														
+	define('DOMOTICZDEVICE', '****');																														
 	// URLS
 	define('DELTA_LOGIN_URL', 'https://mydeltasolar.deltaww.com/includes/process_login.php');
 	define('DELTA_DATA_URL', 'https://mydeltasolar.deltaww.com/includes/process_gtop.php?_=');
