@@ -5,17 +5,17 @@
 
 /**
  * Pass2PHP
- * php version 7.0
+ * php version 7.3 (Debian Buster 26-1-2020)
  *
  * @category Home_Automation
- * @package  Pass2PHP FULL script for Goodwe Inverter
+ * @package  Pass2PHP FULL script for Delta Inverter
  * @author   Sándor Incze
  * @license  GNU GPLv3
  * @link     https://github.com/sincze/Domoticz
  **/
 
 // $ sudo apt-get update && sudo apt-get upgrade
-// $ sudo apt-get install php7.0 php7.0-curl php7.0-gd php7.0-imap php7.0-json php7.0-mcrypt php7.0- php7.0-cli
+// $ sudo apt-get install php php-curl php-gd php-imap php-json php- php-cli
 // $ cd /home/pi/domoticz/scripts
 // $ mkdir pass2php
 // $ cd pass2php
