@@ -25,10 +25,9 @@
 // Check device idx (Setup-> Devices) for created Virtual Sensor
 // Check Setup -> Settings -> Local Networks if '127.0.0.*' is present.
 // In delta_inverter.php 
-// Modify **** to your username  line 48
-// Modify **** to your password  line 49
-// Modify **** to your plantID   line 50
-// Modify DOMOTICZDEVICE **** to your IDX  line 54
+// Modify **** to your username in line 47
+// Modify **** to your password in line 48
+// Modify DOMOTICZDEVICE **** to your IDX in line 49
 // In terminal execute 'php /home/pi/domoticz/scripts/pass2php/delta_inverter.php'
 // No errors should be seen, check domoticz created virtual sensor device & log for errors.
 // If device is updated continue.
@@ -47,11 +46,11 @@ function retrieve_Delta_data($command)
 {
 	define('USERNAME', '****');
 	define('PASSWORD', '****');
-	define('PLANTID', '****');
-	define('USER_AGENT', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36');		//Set a user agent. 
-	define('COOKIE_FILE','/var/tmp/Delta.cookie');													//Where our cookie information will be stored (need to be writable!)
+	define('DOMOTICZDEVICE', '****');	
+
+	define('USER_AGENT', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36');
+	define('COOKIE_FILE','/var/tmp/Delta.cookie');	//Where our cookie information will be stored (need to be writable!)
 		
-	define('DOMOTICZDEVICE', '****');																														
 	// URLS
 	define('DELTA_LOGIN_URL', 'https://mydeltasolar.deltaww.com/includes/process_login.php');
 	define('DELTA_DATA_URL', 'https://mydeltasolar.deltaww.com/includes/process_gtop.php?_=');
@@ -69,10 +68,10 @@ function retrieve_Delta_data($command)
 								)
 			);
 
-
 	$continue=true;
 	$debug=true;
-	header('Content-Type: application/json');
+	
+	//header('Content-Type: application/json');
 
 	$curl = curl_init();
 	curl_setopt($curl, CURLOPT_URL, DELTA_LOGIN_URL);
@@ -121,11 +120,9 @@ function retrieve_Delta_data($command)
 	if ($result=='{"errmsg":"","sucmsg":""}')
 	{
 		lg("Login OK to proceed -> ");
-		//echo("Login OK to proceed -> ");
 	}
 	else 
 	{
-		//echo("Login NOT OK");
 		lg("Login NOT OK");
 		$continue=false;
 	}
@@ -149,7 +146,7 @@ function retrieve_Delta_data($command)
 		curl_setopt($curl, CURLOPT_ENCODING, '');	
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);						
 		$result = curl_exec($curl);							
-//		print_r($result);
+		//print_r($result);
 
 		if(curl_errno($curl)){
 			switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
@@ -164,57 +161,67 @@ function retrieve_Delta_data($command)
 			}
 		}	
 		curl_close($curl);
-		
-		// Retrieve aditional DATA
-		$curl = curl_init();
-		curl_setopt($curl, CURLOPT_URL, DELTA_WATT_URL);
-		curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query( postvalues_daily_data() ));
-		curl_setopt($curl, CURLOPT_POST, true);				
-		curl_setopt($curl, CURLOPT_HTTPHEADER, LOGINHEADER);
-		curl_setopt($curl, CURLOPT_COOKIEJAR, COOKIE_FILE);	
-		curl_setopt($curl, CURLOPT_COOKIEFILE, COOKIE_FILE);
-		curl_setopt($curl, CURLOPT_REFERER, DATA_REFERER); 
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);	
-		curl_setopt($curl, CURLOPT_USERAGENT, USER_AGENT);			//Sets the user agennt		
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);				//We don't want any HTTPS / SSL errors.
-		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);				//We don't want any HTTPS / SSL errors.
-		curl_setopt($curl, CURLOPT_SSLVERSION, 1);
-		curl_setopt($curl, CURLOPT_ENCODING, '');	
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);						
-		$result2 = curl_exec($curl);							
-//		print_r($result2);
 
-		
-		if(curl_errno($curl)){
-			switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
- 				case 200:   $continue=true;# OK
- 	    					lg('Delta inverter: Watt Data: Expected HTTP code: ', $http_code);
-        					break;
-				case 302:   $continue=true;# OK
- 	    					lg('Delta inverter: Watt Data: Expected HTTP code: ', $http_code);
-        					break;        				
-        		default:    $continue=false;
-        					lg('Delta inverter: Watt Data: Unexpected HTTP code: ', $http_code);
+
+		if ($continue) { 
+
+				$plant_id=extract_plantid_from_data($result);
+				$today_power=extract_today_power_from_data($result);
+
+				if ( $plant_id!=false && isset($today_power) )
+				{		
+					// Retrieve aditional DATA
+					$curl = curl_init();
+					curl_setopt($curl, CURLOPT_URL, DELTA_WATT_URL);
+					curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query( postvalues_daily_data($plant_id) ));
+					curl_setopt($curl, CURLOPT_POST, true);				
+					curl_setopt($curl, CURLOPT_HTTPHEADER, LOGINHEADER);
+					curl_setopt($curl, CURLOPT_COOKIEJAR, COOKIE_FILE);	
+					curl_setopt($curl, CURLOPT_COOKIEFILE, COOKIE_FILE);
+					curl_setopt($curl, CURLOPT_REFERER, DATA_REFERER); 
+					curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+					curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);	
+					curl_setopt($curl, CURLOPT_USERAGENT, USER_AGENT);			//Sets the user agennt		
+					curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1);				//We don't want any HTTPS / SSL errors.
+					curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);				//We don't want any HTTPS / SSL errors.
+					curl_setopt($curl, CURLOPT_SSLVERSION, 1);
+					curl_setopt($curl, CURLOPT_ENCODING, '');	
+					curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);						
+					$result = curl_exec($curl);							
+					//print_r($result);
+
+					if(curl_errno($curl)){
+						switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
+ 							case 200:   $continue=true;# OK
+ 	    								lg('Delta inverter: Watt Data: Expected HTTP code: ', $http_code);
+        								break;
+							case 302:   $continue=true;# OK
+ 	    								lg('Delta inverter: Watt Data: Expected HTTP code: ', $http_code);
+        								break;        				
+        					default:    $continue=false;
+        								lg('Delta inverter: Watt Data: Unexpected HTTP code: ', $http_code);
+						}
+					}
+
+					curl_close($curl);
+
+					if ($continue) {
+
+						$current_watt=extract_watt_from_data($result);
+
+						if ( isset($today_power) && isset($current_watt) && is_int($today_power) && is_int($current_watt) ) 
+						{
+							$str=( $current_watt.';'. $today_power);
+					    	lg('Delta Inverter: '. $current_watt.' for domoticz: '.$str);
+							print('Delta Inverter: for domoticz: '.$str);
+							ud(DOMOTICZDEVICE,0,$str);	
+						}
+					}		
+				}
 			}
-		}
-
-		curl_close($curl);
-
-		if ($continue) {
-
-			$data=extract_data($result);
-			$data2=extract_additional_data($result2);
-
-			if ($result!=false && $result2!=false) {
-				$str=( $data2.';'. $data['today_power']);
-				lg('Delta Inverter: '. $data2.' for domoticz: '.$str);
-				print('Delta Inverter: '. $data2.' for domoticz: '.$str);
-				ud(DOMOTICZDEVICE,0,$str);	
-			}
-		}		
 	}
 }
+
 
 function postvalues_login()
 {
@@ -225,8 +232,8 @@ function postvalues_login()
 	return $postValues;
 }
 
-function postvalues_daily_data()
-{
+function postvalues_daily_data($plant_id)
+{	
 	$postValues = array(
 		'item'		=> 'energy',
 		'unit'	=> 'day',
@@ -236,7 +243,7 @@ function postvalues_daily_data()
 		'month'	=> date("m"),
 		'day'	=> date("d"),
 		'is_inv'	=> '1',
-		'plant_id'	=> PLANTID, 
+		'plant_id'	=> $plant_id, 
 		'start_date'	=> '',
 		'plt_type'	=> '1',
 		'mtnm'	=> '0'
@@ -244,29 +251,29 @@ function postvalues_daily_data()
 	return $postValues;
 }
 
-function extract_additional_data($queryresult)
+function extract_watt_from_data($queryresult)
 {
-	$result=false;
+	$current_watt=false;
 	$queryresult = json_decode($queryresult, JSON_PRETTY_PRINT);
-	//print_r($queryresult);
-	if(isset($queryresult['top'])) {
-		$result=end($queryresult['top']);
-		print_r($result);
-	}
-	return $result;
+	if(isset($queryresult['top'])) $current_watt=end($queryresult['top']);
+	return $current_watt;
 }
 
-function extract_data($queryresult)
+function extract_plantid_from_data($queryresult)
 {
-	$result=false;
+	$plant_id=false; 
 	$queryresult = json_decode($queryresult, JSON_PRETTY_PRINT);
-//	print_r($queryresult);
-	if(isset($queryresult['te']['0']) && isset($queryresult['cur']['0'])) {
-		$result = array('today_power' => $queryresult['te']['0'], 'current_watt' => $queryresult['cur']['0']);	
-	}
-	return $result;
+	if(isset($queryresult['plant_ID']['0'])) $plant_id=$queryresult['plant_ID']['0'];
+	return $plant_id; 
 }
 
+function extract_today_power_from_data($queryresult)
+{
+	$today_power=false;
+	$queryresult = json_decode($queryresult, JSON_PRETTY_PRINT);
+	if(isset($queryresult['te']['0'])) $today_power=$queryresult['te']['0'];
+	return $today_power; 
+}
 
 function lg($msg)   // Can be used to write loglines to separate file or to internal domoticz log. Check settings.php for value.
 {
