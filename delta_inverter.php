@@ -154,13 +154,13 @@ function retrieve_Delta_data($command)
 		if(curl_errno($curl)){
 			switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
  				case 200:   $continue=true;# OK
- 	    					lg('Growatt inverter: Data: Expected HTTP code: ', $http_code);
+ 	    					lg('Delta inverter: Data: Expected HTTP code: ', $http_code);
         					break;
 				case 302:   $continue=true;# OK
- 	    					lg('Growatt inverter: Data: Expected HTTP code: ', $http_code);
+ 	    					lg('Delta inverter: Data: Expected HTTP code: ', $http_code);
         					break;        				
         		default:    $continue=false;
-        					lg('Growatt inverter: Data: Unexpected HTTP code: ', $http_code);
+        					lg('Delta inverter: Data: Unexpected HTTP code: ', $http_code);
 			}
 		}	
 		curl_close($curl);
@@ -189,13 +189,13 @@ function retrieve_Delta_data($command)
 		if(curl_errno($curl)){
 			switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
  				case 200:   $continue=true;# OK
- 	    					lg('Growatt inverter: Watt Data: Expected HTTP code: ', $http_code);
+ 	    					lg('Delta inverter: Watt Data: Expected HTTP code: ', $http_code);
         					break;
 				case 302:   $continue=true;# OK
- 	    					lg('Growatt inverter: Watt Data: Expected HTTP code: ', $http_code);
+ 	    					lg('Delta inverter: Watt Data: Expected HTTP code: ', $http_code);
         					break;        				
         		default:    $continue=false;
-        					lg('Growatt inverter: Watt Data: Unexpected HTTP code: ', $http_code);
+        					lg('Delta inverter: Watt Data: Unexpected HTTP code: ', $http_code);
 			}
 		}
 
