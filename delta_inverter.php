@@ -209,7 +209,8 @@ function retrieve_Delta_data($command)
 
 						$current_watt=extract_watt_from_data($result);
 
-						if ( isset($today_power) && isset($current_watt) && is_int($today_power) && is_int($current_watt) ) 
+						//if ( isset($today_power) && isset($current_watt) && is_int($today_power) && is_int($current_watt) ) 
+						if ( isset($today_power) && isset($current_watt) ) 
 						{
 							$str=( $current_watt.';'. $today_power);
 					    	lg('Delta Inverter: '. $current_watt.' for domoticz: '.$str);
