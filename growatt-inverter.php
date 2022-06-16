@@ -60,8 +60,12 @@ function retrieve_growatt_data($command)
 	define('USER_AGENT', 'Dalvik/2.1.0 (Linux; U; Android 9; ONEPLUS A6003 Build/PKQ1.180716.001)');	// Set a user agent. 
 	define('COOKIE_FILE','/home/pi/domoticz/scripts/pass2php/growatt.cookie');							// Where our cookie information will be stored (need to be writable!)
 	define('HEADER',array('Content-Type: application/x-www-form-urlencoded;charset=UTF-8'));
-	define('LOGIN_FORM_URL', 'http://server-api.growatt.com/newLoginAPI.do');							// URL of the login form.
-	define('LOGIN_ACTION_URL', 'http://server-api.growatt.com/newLoginAPI.do');							// Login action URL. Sometimes, this is the same URL as the login form.
+	//define('LOGIN_FORM_URL', 'http://server-api.growatt.com/newLoginAPI.do');							// URL of the login form.
+	//define('LOGIN_ACTION_URL', 'http://server-api.growatt.com/newLoginAPI.do');							// Login action URL. Sometimes, this is the same URL as the login form.
+	define('LOGIN_FORM_URL', 'https://server-api.growatt.com/newTwoLoginAPI.do'); 							// 16-06-2022: URL of the login form. 
+	define('LOGIN_ACTION_URL', 'https://server-api.growatt.com/newTwoLoginAPI.do');							// 16-06-2022: Login action URL. Sometimes, this is the same URL as the login form.
+	
+	
 	define('DOMOTICZDEVICE', '****');																	// 'idx_here' For Watt / Daily Return																												
 	$continue=true;
 
