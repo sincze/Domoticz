@@ -29,7 +29,7 @@
 // Modify **** to your stationid line 46
 // Modify DOMOTICZDEVICE **** to your IDX  line 47
 
-// In terminal execute 'php /home/pi/domoticz/scripts/pass2php/goodwe-inverter.php'
+// In terminal execute 'php /home/pi/domoticz/scripts/pass2php/Goodwe.php'
 // No errors should be seen, check domoticz created virtual sensor device & log for errors.
 // If device is updated continue.
 // $ sudo nano /etc/crontab
@@ -44,13 +44,14 @@ define('domoticz','http://127.0.0.1:8080/');
 define('USERNAME', '****');
 define('PASSWORD', '****');
 define('STATIONID', '****');
-define('DOMOTICZDEVICE', ***);	
+define('DOMOTICZDEVICE', ***);
 
 $continue=true;
 $debug=true;
 
 define('USER_AGENT', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36');	//Set a user agent. 
-define('COOKIE_FILE','/var/log/GoodWe.cookie');													//Where our cookie information will be stored (need to be writable!)
+//define('COOKIE_FILE','/var/log/GoodWe.cookie');													//Where our cookie information will be stored (need to be writable!)
+define('COOKIE_FILE','/home/pi/domoticz/scripts/GoodWe.cookie');													//Where our cookie information will be stored (need to be writable!)
 
 // URLS
 define('GOODWELOGINURL', 'https://eu.semsportal.com/Home/Login');
@@ -124,7 +125,7 @@ function login($username,$password)
 	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);						
 	curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);						//Do we want to follow any redirects?
 	$result=curl_exec($curl);									//Execute the login request.
-	//print_r($result);
+	print_r($result);
 
 	if(curl_errno($curl)){
 		switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
@@ -141,16 +142,24 @@ function login($username,$password)
 	curl_close($curl);
 	
 	if ($debug) {
-		if (file_exists(COOKIE_FILE)) lg ('Cookie File: '.COOKIE_FILE.' exists!'); else lg ('Cookie File: '.COOKIE_FILE.' does NOT exist!');	
+		if (file_exists(COOKIE_FILE)) lg ('Goodwe inverter: Cookie File: '.COOKIE_FILE.' exists!'); else lg ('Goodwe inverter: Cookie File: '.COOKIE_FILE.' does NOT exist!');	
 	}
 	
 	if (is_writable(COOKIE_FILE)) {
-			if ($debug) lg('Cookie File: '.COOKIE_FILE.' is writable!'); 			
+			if ($debug) lg('Goodwe inverter: Cookie File: '.COOKIE_FILE.' is writable!'); 			
 			$continue=true; 
 	} else { 
-			if ($debug) lg('Cookie File: '.COOKIE_FILE.' NOT writable!');
+			if ($debug) lg('Goodwe inverter: Cookie File: '.COOKIE_FILE.' NOT writable!');
 			$continue=false;
-		}	
+		}
+	//interpret the body of the login to see if proper login values have been returned
+	$jsonresult = json_decode($result, JSON_PRETTY_PRINT);
+	if ($jsonresult['code']>=0){
+			$continue=true; 
+	} else { 
+			if ($debug) lg('Goodwe inverter: login failed with message: '.$jsonresult['msg']);
+			$continue=false;
+		}
 	return $continue;
 }
 
