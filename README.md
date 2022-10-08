@@ -7,3 +7,9 @@ Pass2PHP Domoticz Scripts
 - Save as...
 
 See each individual file for Installation instructions.
+
+Support for multiple Inverters.
+- SolarEdge
+- Growatt
+- Fronsius
+- GoodWe
