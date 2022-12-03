@@ -9,7 +9,8 @@
  * @author   Sándor Incze
  * @license  GNU GPLv3
  * @link     https://github.com/sincze/Domoticz
- * @version  1.1 (22-01-2022)
+ * @version  1.1 (22-01-2022) 
+ * @version  1.2 (02-12-2022) Api Changed from V1 to V3.
  **/
 
 // $ sudo apt-get update && sudo apt-get upgrade
@@ -24,10 +25,10 @@
 // Check Setup -> Settings -> Local Networks if '127.0.0.*' is present.
 
 // In growatt-inverter.php 
-// Modify **** to your username  line 44
-// Modify **** to your password  line 45
-// Modify **** to your stationid line 46
-// Modify DOMOTICZDEVICE **** to your IDX  line 47
+// Modify **** to your username  line 45
+// Modify **** to your password  line 46
+// Modify **** to your stationid line 47
+// Modify DOMOTICZDEVICE **** to your IDX  line 48
 
 // In terminal execute 'php /home/pi/domoticz/scripts/pass2php/Goodwe.php'
 // No errors should be seen, check domoticz created virtual sensor device & log for errors.
@@ -56,8 +57,9 @@ define('COOKIE_FILE','/home/pi/domoticz/scripts/GoodWe.cookie');													//W
 // URLS
 define('GOODWELOGINURL', 'https://eu.semsportal.com/Home/Login');
 define('CLIENTIPISVN', 'https://eu.semsportal.com/GopsApi/Post?s=v2/Common/CheckClientIpIsVN');
-define('GOODWEDATAURL', 'https://eu.semsportal.com/GopsApi/Post?s=v1/PowerStation/GetMonitorDetailByPowerstationId');
-	
+//define('GOODWEDATAURL', 'https://eu.semsportal.com/GopsApi/Post?s=v1/PowerStation/GetMonitorDetailByPowerstationId');
+define('GOODWEDATAURL', 'https://eu.semsportal.com/GopsApi/Post?s=v3/PowerStation/GetPlantDetailByPowerstationId');
+
 // REFERER
 define('LOGIN_REFERER', 'https://eu.semsportal.com/Home/Login');
 	
@@ -267,7 +269,8 @@ function postvalues_getdataformat()
 function postvalues_PowerstationId($token)
 {
 	$postValues = array(
-			'str'   => '{"api":"v1/PowerStation/GetMonitorDetailByPowerstationId","param":{"powerStationId":"'.$token.'"}}'
+//			'str'   => '{"api":"v1/PowerStation/GetMonitorDetailByPowerstationId","param":{"powerStationId":"'.$token.'"}}'
+			'str'   => '{"api":"v3/PowerStation/GetPlantDetailByPowerstationId","param":{"powerStationId":"'.$token.'"}}'
 		);
 	return $postValues;
 }
