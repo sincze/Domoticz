@@ -38,7 +38,7 @@
 // $ sudo nano /etc/crontab
 // add line: */5 * * * *   root    php /home/pi/domoticz/scripts/pass2php/solarmanportal.php >/dev/null 2>&1  
 
-error_reporting(E_ALL);						// 14-04-2019 Pass2PHP 3.0
+error_reporting(E_ALL);					// 14-04-2019 Pass2PHP 3.0
 ini_set("display_errors","on");				// 14-04-2019 Pass2PHP 3.0
 date_default_timezone_set('Europe/Amsterdam');
 define('time',$_SERVER['REQUEST_TIME']);	
@@ -68,13 +68,13 @@ foreach ($inverters as $inverter) {
 	if(curl_errno($curl)){
 		switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
 		 	case 200:   $continue=true;# OK
-					 	lg('Solarman inverter: Data: Expected HTTP code: ', $http_code);
+					 	lg('Solarman inverter: Data: Expected HTTP code: '. $http_code);
 						break;
 			case 302:   $continue=true;# OK
-					 	lg('Solarman inverter: Data: Expected HTTP code: ', $http_code);
+					 	lg('Solarman inverter: Data: Expected HTTP code: '. $http_code);
 						break;        				
 			default:    $continue=false;
-						lg('Solarman inverter: Data: Unexpected HTTP code: ', $http_code);
+						lg('Solarman inverter: Data: Unexpected HTTP code: '. $http_code);
 		}
 	}
 	curl_close($curl);
