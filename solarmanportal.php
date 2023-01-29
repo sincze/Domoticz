@@ -83,7 +83,8 @@ foreach ($inverters as $inverter) {
 		$data=extract_data($result);
 		if ($data != false) {										// Continue if we have real data
 			$current_watt= $data['current_watt'];
-			$total_power = $data['total_power'];
+			//$total_power = $data['total_power'];
+			$total_power = $data['total_power']*10000; // 29-01-2023 Correction
 			$str = ( $current_watt.';'.$total_power);
 
       lg('Solarman '.$inverter['device'].' Inverter: '. $data['current_watt'].' for domoticz: '.$str);
