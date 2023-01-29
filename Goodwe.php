@@ -98,7 +98,11 @@ function fullpackage()
 		if ($debug) lg('Goodwe inverter: 5. I was able to login lets retrieve data!');	
 		$cookieresult=retrieve_data();								// If cookie was created retrieve data
 		if ($cookieresult===false) {
-			if ($debug) lg('Goodwe inverter: 6. Something Failed retrieving data with '.COOKIE_FILE);	
+			if ($debug) lg('Goodwe inverter: 6. Something Failed retrieving data with '.COOKIE_FILE);
+			// After some time the key in the saved coockie expires, thus better to remove the coockie and
+			// Generate a new one
+			// D.Y 29-01-2023
+			unset (COOKIE_FILE);
 		}
 	}	
 	else {
