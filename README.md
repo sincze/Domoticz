@@ -13,3 +13,4 @@ Support for multiple Inverters.
 - Growatt
 - Fronsius
 - GoodWe
+- Omnik and Solis
