@@ -13,4 +13,4 @@ Support for multiple Inverters.
 - Growatt
 - Fronsius
 - GoodWe
-- Omnik and Solis
+- Omnik and Solis (Login at https://m.ginlong.com/ not soliscloud to obtain UID and PLANTID)
