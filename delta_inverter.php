@@ -92,13 +92,13 @@ function retrieve_Delta_data($command)
 	if(curl_errno($curl)){
 		switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
  			case 200:   $continue=true;# OK
- 	    				lg('Delta: Login: Expected HTTP code: ', $http_code);
+ 	    				lg('Delta: Login: Expected HTTP code: '. $http_code);
         				break;
 			case 302:   $continue=true;# OK
- 	    				lg('Delta: Login: Expected HTTP code: ', $http_code);
+ 	    				lg('Delta: Login: Expected HTTP code: '. $http_code);
         				break;        				
         	default:    $continue=false;
-        				lg('Delta: Login: Unexpected HTTP code: ', $http_code);
+        				lg('Delta: Login: Unexpected HTTP code: '. $http_code);
 		}
 	}
 
@@ -151,13 +151,13 @@ function retrieve_Delta_data($command)
 		if(curl_errno($curl)){
 			switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
  				case 200:   $continue=true;# OK
- 	    					lg('Delta inverter: Data: Expected HTTP code: ', $http_code);
+ 	    					lg('Delta inverter: Data: Expected HTTP code: '. $http_code);
         					break;
 				case 302:   $continue=true;# OK
- 	    					lg('Delta inverter: Data: Expected HTTP code: ', $http_code);
+ 	    					lg('Delta inverter: Data: Expected HTTP code: '. $http_code);
         					break;        				
         		default:    $continue=false;
-        					lg('Delta inverter: Data: Unexpected HTTP code: ', $http_code);
+        					lg('Delta inverter: Data: Unexpected HTTP code: '. $http_code);
 			}
 		}	
 		curl_close($curl);
