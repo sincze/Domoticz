@@ -193,13 +193,13 @@ function retrieve_Delta_data($command)
 					if(curl_errno($curl)){
 						switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
  							case 200:   $continue=true;# OK
- 	    								lg('Delta inverter: Watt Data: Expected HTTP code: ', $http_code);
+ 	    								lg('Delta inverter: Watt Data: Expected HTTP code: '. $http_code);
         								break;
 							case 302:   $continue=true;# OK
- 	    								lg('Delta inverter: Watt Data: Expected HTTP code: ', $http_code);
+ 	    								lg('Delta inverter: Watt Data: Expected HTTP code: '. $http_code);
         								break;        				
         					default:    $continue=false;
-        								lg('Delta inverter: Watt Data: Unexpected HTTP code: ', $http_code);
+        								lg('Delta inverter: Watt Data: Unexpected HTTP code: '. $http_code);
 						}
 					}
 
@@ -293,7 +293,7 @@ function curl($url){
 	curl_setopt($ch,CURLOPT_URL,$url);
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
  	curl_setopt($ch,CURLOPT_CONNECTTIMEOUT, 5);
-    curl_setopt($ch,CURLOPT_TIMEOUT, 3);
+    	curl_setopt($ch,CURLOPT_TIMEOUT, 3);
 	curl_setopt($ch,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
 	curl_setopt($ch,CURLOPT_HTTPHEADER,$headers);
 	$data=curl_exec($ch);
