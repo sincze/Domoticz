@@ -95,13 +95,13 @@ function retrieve_growatt_data($command)
 	if(curl_errno($curl)){
 		switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
  			case 200:   $continue=true;# OK
- 	    				lg('Growatt inverter: Login: Expected HTTP code: ', $http_code);
+ 	    				lg('Growatt inverter: Login: Expected HTTP code: '. $http_code);
         				break;
 			case 302:   $continue=true;# OK
- 	    				lg('Growatt inverter: Login: Expected HTTP code: ', $http_code);
+ 	    				lg('Growatt inverter: Login: Expected HTTP code: '. $http_code);
         				break;        				
         	default:    $continue=false;
-        				lg('Growatt inverter: Login: Unexpected HTTP code: ', $http_code);
+        				lg('Growatt inverter: Login: Unexpected HTTP code: '. $http_code);
 		}
 	}
 	curl_close($curl);
@@ -128,13 +128,13 @@ function retrieve_growatt_data($command)
 		if(curl_errno($curl)){
 			switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
  				case 200:   $continue=true;# OK
- 	    					lg('Growatt inverter: Data: Expected HTTP code: ', $http_code);
+ 	    					lg('Growatt inverter: Data: Expected HTTP code: '. $http_code);
         					break;
 				case 302:   $continue=true;# OK
- 	    					lg('Growatt inverter: Data: Expected HTTP code: ', $http_code);
+ 	    					lg('Growatt inverter: Data: Expected HTTP code: '. $http_code);
         					break;        				
         		default:    $continue=false;
-        					lg('Growatt inverter: Data: Unexpected HTTP code: ', $http_code);
+        					lg('Growatt inverter: Data: Unexpected HTTP code: '. $http_code);
 			}
 		}	
 		curl_close($curl);
