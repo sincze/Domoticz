@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?PHP
 //https://mydeltasolar.deltaww.com
-// https://mydeltasolar.deltaww.com/includes/process_gtop_plot.php
+//https://mydeltasolar.deltaww.com/includes/process_gtop_plot.php
 
 /**
  * Pass2PHP
@@ -12,6 +12,9 @@
  * @author   Sándor Incze
  * @license  GNU GPLv3
  * @link     https://github.com/sincze/Domoticz
+ * 
+ * Version 1.0 26-10-2020 Initial Verion
+ * Version 2.0 10-07-2023 Repaired tnx to spacewalker56
  **/
 
 // $ sudo apt-get update && sudo apt-get upgrade
@@ -25,20 +28,22 @@
 // Check device idx (Setup-> Devices) for created Virtual Sensor
 // Check Setup -> Settings -> Local Networks if '127.0.0.*' is present.
 // In delta_inverter.php 
-// Modify **** to your username in line 47
-// Modify **** to your password in line 48
-// Modify DOMOTICZDEVICE **** to your IDX in line 49
+// Modify **** to your username in line 52
+// Modify **** to your password in line 53
+// Modify DOMOTICZDEVICE **** to your IDX in line 54
 // In terminal execute 'php /home/pi/domoticz/scripts/pass2php/delta_inverter.php'
 // No errors should be seen, check domoticz created virtual sensor device & log for errors.
 // If device is updated continue.
 // $ sudo nano /etc/crontab
 // add line: */5 * * * *   root    php /home/pi/domoticz/scripts/pass2php/delta_inverter.php >/dev/null 2>&1  
 
-error_reporting(E_ALL);						// 14-04-2019 Pass2PHP 3.0
-ini_set("display_errors","on");				// 14-04-2019 Pass2PHP 3.0
+error_reporting(E_ALL);				// 14-04-2019 Pass2PHP 3.0
+ini_set("display_errors","on");			// 14-04-2019 Pass2PHP 3.0
 date_default_timezone_set('Europe/Amsterdam');
 define('time',$_SERVER['REQUEST_TIME']);	// Time is here
 define('domoticz','http://127.0.0.1:8080/');
+
+header('Content-Type: application/json');
 
 retrieve_Delta_data('test');
 
@@ -53,8 +58,8 @@ function retrieve_Delta_data($command)
 		
 	// URLS
 	define('DELTA_LOGIN_URL', 'https://mydeltasolar.deltaww.com/includes/process_login.php');
-	define('DELTA_DATA_URL', 'https://mydeltasolar.deltaww.com/includes/process_gtop.php?_=');
-	define('DELTA_WATT_URL', 'https://mydeltasolar.deltaww.com/AjaxPlantUpdatePlant.php');
+	define('DELTA_DATA_URL', 'https://mydeltasolar.deltaww.com/includes/process_init_plant.php?_=');
+	define('DELTA_WATT_URL', 'https://mydeltasolar.deltaww.com/includes/process_gtop_plot.php');
 	
 	// REFERER
 	define('LOGIN_REFERER', 'https://mydeltasolar.deltaww.com/index.php?lang=en-us');
@@ -71,7 +76,7 @@ function retrieve_Delta_data($command)
 	$continue=true;
 	$debug=true;
 	
-	//header('Content-Type: application/json');
+	header('Content-Type: application/json');
 
 	$curl = curl_init();
 	curl_setopt($curl, CURLOPT_URL, DELTA_LOGIN_URL);
@@ -104,7 +109,6 @@ function retrieve_Delta_data($command)
 
 	curl_close($curl);
 
- 	
 	if ($debug) {
 		if (file_exists(COOKIE_FILE)) lg ('Cookie File: '.COOKIE_FILE.' exists!'); else lg ('Cookie File: '.COOKIE_FILE.' does NOT exist!');	
 	}
@@ -166,14 +170,14 @@ function retrieve_Delta_data($command)
 		if ($continue) { 
 
 				$plant_id=extract_plantid_from_data($result);
-				$today_power=extract_today_power_from_data($result);
+				$today_power=extract_today_power_from_data($plant_id,$result);
 
 				if ( $plant_id!=false && isset($today_power) )
 				{		
 					// Retrieve aditional DATA
 					$curl = curl_init();
-					curl_setopt($curl, CURLOPT_URL, DELTA_WATT_URL);
-					curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query( postvalues_daily_data($plant_id) ));
+					curl_setopt($curl, CURLOPT_URL, DELTA_WATT_URL);					
+					curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query( postvalues_watt_data() ));
 					curl_setopt($curl, CURLOPT_POST, true);				
 					curl_setopt($curl, CURLOPT_HTTPHEADER, LOGINHEADER);
 					curl_setopt($curl, CURLOPT_COOKIEJAR, COOKIE_FILE);	
@@ -209,7 +213,6 @@ function retrieve_Delta_data($command)
 
 						$current_watt=extract_watt_from_data($result);
 
-						//if ( isset($today_power) && isset($current_watt) && is_int($today_power) && is_int($current_watt) ) 
 						if ( isset($today_power) && isset($current_watt) ) 
 						{
 							$str=( $current_watt.';'. $today_power);
@@ -252,11 +255,21 @@ function postvalues_daily_data($plant_id)
 	return $postValues;
 }
 
+function postvalues_watt_data()
+{	
+	$postValues = array(
+		'unit' => 'day',
+		'is_all_plants' => '1'
+	);
+	return $postValues;
+}
+
 function extract_watt_from_data($queryresult)
 {
 	$current_watt=false;
 	$queryresult = json_decode($queryresult, JSON_PRETTY_PRINT);
 	if(isset($queryresult['top'])) $current_watt=end($queryresult['top']);
+	echo 'extract_watt_from_data'.$current_watt.PHP_EOL;
 	return $current_watt;
 }
 
@@ -264,21 +277,22 @@ function extract_plantid_from_data($queryresult)
 {
 	$plant_id=false; 
 	$queryresult = json_decode($queryresult, JSON_PRETTY_PRINT);
-	if(isset($queryresult['plant_ID']['0'])) $plant_id=$queryresult['plant_ID']['0'];
+	if(isset($queryresult['plant_ID']['1'])) $plant_id=$queryresult['plant_ID']['1'];
+	echo 'extract_plantid_from_data'.$plant_id.PHP_EOL;
 	return $plant_id; 
 }
 
-function extract_today_power_from_data($queryresult)
+function extract_today_power_from_data($plant_id,$queryresult)
 {
 	$today_power=false;
 	$queryresult = json_decode($queryresult, JSON_PRETTY_PRINT);
-	if(isset($queryresult['te']['0'])) $today_power=$queryresult['te']['0'];
+	if(isset($queryresult['P_cid'])) $today_power=$queryresult['P_cid'][$plant_id]['0'];
 	return $today_power; 
 }
 
 function lg($msg)   // Can be used to write loglines to separate file or to internal domoticz log. Check settings.php for value.
 {
-	curl(domoticz.'json.htm?type=command&param=addlogmessage&message='.urlencode('--->> '.$msg));		
+	curl(domoticz.'json.htm?type=command&param=addlogmessage&message='.urlencode('--->>Delta: '.$msg));		
 }
 
 function ud($idx,$nvalue,$svalue,$check=false)
@@ -293,7 +307,7 @@ function curl($url){
 	curl_setopt($ch,CURLOPT_URL,$url);
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
  	curl_setopt($ch,CURLOPT_CONNECTTIMEOUT, 5);
-    	curl_setopt($ch,CURLOPT_TIMEOUT, 3);
+  	curl_setopt($ch,CURLOPT_TIMEOUT, 3);
 	curl_setopt($ch,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
 	curl_setopt($ch,CURLOPT_HTTPHEADER,$headers);
 	$data=curl_exec($ch);
@@ -301,4 +315,6 @@ function curl($url){
 	return $data;
 }
 
+
+	
 ?>
