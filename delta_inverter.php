@@ -124,6 +124,7 @@ function retrieve_Delta_data($command)
 	if ($result=='{"errmsg":"","sucmsg":""}')
 	{
 		lg("Login OK to proceed -> ");
+		$continue=true;
 	}
 	else 
 	{
