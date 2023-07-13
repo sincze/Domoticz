@@ -91,7 +91,8 @@ function retrieve_Delta_data($command)
 	curl_setopt($curl, CURLOPT_REFERER, LOGIN_REFERER); 					
 	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);						
 	curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);						//Do we want to follow any redirects?
-	$result=curl_exec($curl);												//Execute the login request.
+	$result=curl_exec($curl);									//Execute the login request.
+	echo 'Login: ';
 	//print_r($result);
 
 	if(curl_errno($curl)){
@@ -124,16 +125,18 @@ function retrieve_Delta_data($command)
 	if ($result=='{"errmsg":"","sucmsg":""}')
 	{
 		lg("Login OK to proceed -> ");
+		echo 'OK ready to proceed'.PHP_EOL;
 		$continue=true;
 	}
 	else 
 	{
 		lg("Login NOT OK");
+		echo 'NOT OK'.PHP_EOL;
 		$continue=false;
 	}
 
 	if ($continue) {
-
+		echo 'Retrieve Data';
 		// Retrieve DATA
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_URL, DELTA_DATA_URL.time());
@@ -170,12 +173,15 @@ function retrieve_Delta_data($command)
 
 		if ($continue) { 
 
+				echo ' OK'.PHP_EOL;
+				echo 'Parsing Received Data';
 				$plant_id=extract_plantid_from_data($result);
 				$today_power=extract_today_power_from_data($plant_id,$result);
 
 				if ( $plant_id!=false && isset($today_power) )
 				{		
 					// Retrieve aditional DATA
+					echo ' OK'.PHP_EOL;
 					$curl = curl_init();
 					curl_setopt($curl, CURLOPT_URL, DELTA_WATT_URL);					
 					curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query( postvalues_watt_data() ));
@@ -217,12 +223,13 @@ function retrieve_Delta_data($command)
 						if ( isset($today_power) && isset($current_watt) ) 
 						{
 							$str=( $current_watt.';'. $today_power);
-					    	lg('Delta Inverter: '. $current_watt.' for domoticz: '.$str);
-							print('Delta Inverter: for domoticz: '.$str);
+					    		lg('Delta Inverter: '. $current_watt.' for domoticz: '.$str);
+							print('Delta Inverter: for Domoticz: '.$str);
 							ud(DOMOTICZDEVICE,0,$str);	
 						}
 					}		
 				}
+				else echo ' FAILED'.PHP_EOL;
 			}
 	}
 }
@@ -270,7 +277,7 @@ function extract_watt_from_data($queryresult)
 	$current_watt=false;
 	$queryresult = json_decode($queryresult, JSON_PRETTY_PRINT);
 	if(isset($queryresult['top'])) $current_watt=end($queryresult['top']);
-	echo 'extract_watt_from_data'.$current_watt.PHP_EOL;
+	//echo 'Extract_plantid_from_data: '.$plant_id.PHP_EOL;
 	return $current_watt;
 }
 
@@ -279,7 +286,7 @@ function extract_plantid_from_data($queryresult)
 	$plant_id=false; 
 	$queryresult = json_decode($queryresult, JSON_PRETTY_PRINT);
 	if(isset($queryresult['plant_ID']['0'])) $plant_id=$queryresult['plant_ID']['0'];
-	echo 'extract_plantid_from_data'.$plant_id.PHP_EOL;
+	//echo 'Extract_plantid_from_data: '.$plant_id.PHP_EOL;
 	return $plant_id; 
 }
 
@@ -288,6 +295,7 @@ function extract_today_power_from_data($plant_id,$queryresult)
 	$today_power=false;
 	$queryresult = json_decode($queryresult, JSON_PRETTY_PRINT);
 	if(isset($queryresult['P_cid'])) $today_power=$queryresult['P_cid'][$plant_id]['0'];
+	//echo 'Extract_today_power_from_data: '.$today_power.' kWh'.PHP_EOL;
 	return $today_power; 
 }
 
