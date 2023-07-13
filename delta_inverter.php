@@ -278,7 +278,7 @@ function extract_plantid_from_data($queryresult)
 {
 	$plant_id=false; 
 	$queryresult = json_decode($queryresult, JSON_PRETTY_PRINT);
-	if(isset($queryresult['plant_ID']['1'])) $plant_id=$queryresult['plant_ID']['1'];
+	if(isset($queryresult['plant_ID']['0'])) $plant_id=$queryresult['plant_ID']['0'];
 	echo 'extract_plantid_from_data'.$plant_id.PHP_EOL;
 	return $plant_id; 
 }
