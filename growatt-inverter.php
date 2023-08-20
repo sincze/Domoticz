@@ -27,7 +27,7 @@
 // In growatt-inverter.php 
 // Modify **** to your username  line 49
 // Modify **** to your password  line 50
-// Modify DOMOTICZDEVICE **** to your IDX  line 56
+// Modify DOMOTICZDEVICE **** to your IDX  line 66
 
 // In terminal execute 'php /home/pi/domoticz/scripts/pass2php/growatt-inverter.php'
 // No errors should be seen, check domoticz created virtual sensor device & log for errors.
@@ -49,7 +49,7 @@ function retrieve_growatt_data($command)
 	define('USERNAME', '*****');																		// The username or email address of the account.
 	define('PASSWORD', '*****');// The Password of the account
 	$pw =  md5(PASSWORD);					// No Need to double md5
-								//replace leading 0 by c for Growatt
+								// replace leading 0 by c for Growatt
 	for ($i = 0; $i < strlen($pw); $i=$i+2){
 		if ($pw[$i]=='0')
         	{
@@ -60,12 +60,9 @@ function retrieve_growatt_data($command)
 	define('USER_AGENT', 'Dalvik/2.1.0 (Linux; U; Android 9; ONEPLUS A6003 Build/PKQ1.180716.001)');	// Set a user agent. 
 	define('COOKIE_FILE','/home/pi/domoticz/scripts/pass2php/growatt.cookie');							// Where our cookie information will be stored (need to be writable!)
 	define('HEADER',array('Content-Type: application/x-www-form-urlencoded;charset=UTF-8'));
-	//define('LOGIN_FORM_URL', 'http://server-api.growatt.com/newLoginAPI.do');							// URL of the login form.
-	//define('LOGIN_ACTION_URL', 'http://server-api.growatt.com/newLoginAPI.do');							// Login action URL. Sometimes, this is the same URL as the login form.
-	define('LOGIN_FORM_URL', 'https://server-api.growatt.com/newTwoLoginAPI.do'); 							// 16-06-2022: URL of the login form. 
-	define('LOGIN_ACTION_URL', 'https://server-api.growatt.com/newTwoLoginAPI.do');							// 16-06-2022: Login action URL. Sometimes, this is the same URL as the login form.
-	
-	
+	define('LOGIN_FORM_URL', 'https://server.growatt.com/newTwoLoginAPI.do'); 							// 16-06-2022: URL of the login form. 
+	define('LOGIN_ACTION_URL', 'https://server.growatt.com/newTwoLoginAPI.do');							// 20-08-2023: Updated tnx to "oepi-loepi".
+
 	define('DOMOTICZDEVICE', '****');																	// 'idx_here' For Watt / Daily Return																												
 	$continue=true;
 
@@ -75,22 +72,22 @@ function retrieve_growatt_data($command)
 	);
 
 	$curl = curl_init();
-	curl_setopt($curl, CURLOPT_URL, LOGIN_ACTION_URL);						// Set the URL that we want to send our POST request to. In this	case, it's the action URL of the login form.
-	curl_setopt($curl, CURLOPT_POST, true);									// Tell cURL that we want to carry out a POST request.
+	curl_setopt($curl, CURLOPT_URL, LOGIN_ACTION_URL);			// Set the URL that we want to send our POST request to. In this	case, it's the action URL of the login form.
+	curl_setopt($curl, CURLOPT_POST, true);					// Tell cURL that we want to carry out a POST request.
 	curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($postValues));	// Set our post fields / date (from the array above). 
-	curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);						// We don't want any HTTPS errors.
-	curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);						// We don't want any HTTPS errors.
-	curl_setopt($curl, CURLOPT_COOKIEJAR, COOKIE_FILE);						// Where our cookie details are saved. 
+	curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);			// We don't want any HTTPS errors.
+	curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);			// We don't want any HTTPS errors.
+	curl_setopt($curl, CURLOPT_COOKIEJAR, COOKIE_FILE);			// Where our cookie details are saved. 
 																			// This is typically required for authentication, as the session ID is usually saved in the cookie file.
 	curl_setopt($curl, CURLOPT_HTTPHEADER, HEADER);
 	curl_setopt($curl, CURLOPT_COOKIEFILE, COOKIE_FILE); 
-	curl_setopt($curl, CURLOPT_USERAGENT, USER_AGENT);						// Sets the user agent. Some websites will attempt to block bot user agents. //Hence the reason I gave it a Chrome user agent.
-	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);						// Tells cURL to return the output once the request has been executed.
-	curl_setopt($curl, CURLOPT_REFERER, LOGIN_FORM_URL);					// Allows us to set the referer header. In this particular case, 
+	curl_setopt($curl, CURLOPT_USERAGENT, USER_AGENT);			// Sets the user agent. Some websites will attempt to block bot user agents. //Hence the reason I gave it a Chrome user agent.
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);			// Tells cURL to return the output once the request has been executed.
+	curl_setopt($curl, CURLOPT_REFERER, LOGIN_FORM_URL);			// Allows us to set the referer header. In this particular case, 
 																			// we are fooling the server into thinking that we were referred by the login form.
 	curl_setopt ($curl, CURLOPT_SSLVERSION, 1);
-	curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);						// Do we want to follow any redirects?
-	$result=curl_exec($curl);												// Execute the login request.
+	curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);			// Do we want to follow any redirects?
+	$result=curl_exec($curl);						// Execute the login request.
 
 	if(curl_errno($curl)){
 		switch ($http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
@@ -112,8 +109,9 @@ function retrieve_growatt_data($command)
 	if ($continue) {
 
 		$curl = curl_init();
-		$url='http://server-api.growatt.com/newPlantAPI.do?action=getUserCenterEnertyData';
-		curl_setopt($curl, CURLOPT_URL, $url);								
+		//$url='http://server-api.growatt.com/newPlantAPI.do?action=getUserCenterEnertyData';
+		$url='http://server.growatt.com/newPlantAPI.do?action=getUserCenterEnertyData';		// 20-08-2023 Updated URL
+ 		curl_setopt($curl, CURLOPT_URL, $url);								
 		curl_setopt($curl, CURLOPT_COOKIEJAR, COOKIE_FILE);					
 		curl_setopt($curl, CURLOPT_COOKIEFILE, COOKIE_FILE); 
 		curl_setopt($curl, CURLOPT_USERAGENT, USER_AGENT);					
@@ -143,7 +141,6 @@ function retrieve_growatt_data($command)
 
 			$data = json_decode($result, JSON_PRETTY_PRINT);
 			$nowpower = (float)str_ireplace('kWh', '', $data['powerValue']);
-			//$todaypower = (float)str_ireplace('kWh', '', $data['todayStr']);
 			$todaypower = (float)str_ireplace('kWh', '', $data['totalStr']);		// 18-04-2020
 			
 			$str=( $nowpower.';'. $todaypower * 1000 );	#times 1000 to convert the 0.1kWh to 100 WattHour and to convert 2.1kWh to 2100 WattHour
@@ -171,7 +168,7 @@ function curl($url){
 	curl_setopt($ch,CURLOPT_URL,$url);
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
  	curl_setopt($ch,CURLOPT_CONNECTTIMEOUT, 5);
-    curl_setopt($ch,CURLOPT_TIMEOUT, 3);
+    	curl_setopt($ch,CURLOPT_TIMEOUT, 3);
 	curl_setopt($ch,CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
 	curl_setopt($ch,CURLOPT_HTTPHEADER,$headers);
 	$data=curl_exec($ch);
