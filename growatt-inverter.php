@@ -59,7 +59,10 @@ function retrieve_growatt_data($command)
 	
 	define('USER_AGENT', 'Dalvik/2.1.0 (Linux; U; Android 9; ONEPLUS A6003 Build/PKQ1.180716.001)');	// Set a user agent. 
 	define('COOKIE_FILE','/home/pi/domoticz/scripts/pass2php/growatt.cookie');							// Where our cookie information will be stored (need to be writable!)
-	define('HEADER',array('Content-Type: application/x-www-form-urlencoded;charset=UTF-8'));
+	define('HEADER',array('Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
+					  'Connection: keep-alive',
+					  'Host: server.growatt.com',
+					  'User-Agent: Domoticz/1.0'));
 	define('LOGIN_FORM_URL', 'https://server.growatt.com/newTwoLoginAPI.do'); 							// 16-06-2022: URL of the login form. 
 	define('LOGIN_ACTION_URL', 'https://server.growatt.com/newTwoLoginAPI.do');							// 20-08-2023: Updated tnx to "oepi-loepi".
 
