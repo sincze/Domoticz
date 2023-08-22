@@ -27,7 +27,7 @@
 // In growatt-inverter.php 
 // Modify **** to your username  line 49
 // Modify **** to your password  line 50
-// Modify DOMOTICZDEVICE **** to your IDX  line 66
+// Modify DOMOTICZDEVICE **** to your IDX  line 69
 
 // In terminal execute 'php /home/pi/domoticz/scripts/pass2php/growatt-inverter.php'
 // No errors should be seen, check domoticz created virtual sensor device & log for errors.
@@ -65,7 +65,7 @@ function retrieve_growatt_data($command)
 					  'User-Agent: Domoticz/1.0'));
 	define('LOGIN_FORM_URL', 'https://server.growatt.com/newTwoLoginAPI.do'); 							// 16-06-2022: URL of the login form. 
 	define('LOGIN_ACTION_URL', 'https://server.growatt.com/newTwoLoginAPI.do');							// 20-08-2023: Updated tnx to "oepi-loepi".
-
+        define('DATA_URL', 'https://server.growatt.com/newTwoPlantAPI.do?op=getUserCenterEnertyDataByPlantid');
 	define('DOMOTICZDEVICE', '****');																	// 'idx_here' For Watt / Daily Return																												
 	$continue=true;
 
