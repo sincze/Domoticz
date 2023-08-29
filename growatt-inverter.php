@@ -65,7 +65,7 @@ function retrieve_growatt_data($command)
 					  'User-Agent: Domoticz/1.0'));
 	define('LOGIN_FORM_URL', 'https://server.growatt.com/newTwoLoginAPI.do'); 							// 16-06-2022: URL of the login form. 
 	define('LOGIN_ACTION_URL', 'https://server.growatt.com/newTwoLoginAPI.do');							// 20-08-2023: Updated tnx to "oepi-loepi".
-        define('DATA_URL', 'https://server.growatt.com/newTwoPlantAPI.do?op=getUserCenterEnertyDataByPlantid');
+	define('DATA_URL', 'https://server.growatt.com/newPlantAPI.do?action=getUserCenterEnertyData');
 	define('DOMOTICZDEVICE', '****');																	// 'idx_here' For Watt / Daily Return																												
 	$continue=true;
 
@@ -113,8 +113,9 @@ function retrieve_growatt_data($command)
 
 		$curl = curl_init();
 		//$url='http://server-api.growatt.com/newPlantAPI.do?action=getUserCenterEnertyData';
-		$url='http://server.growatt.com/newPlantAPI.do?action=getUserCenterEnertyData';		// 20-08-2023 Updated URL
- 		curl_setopt($curl, CURLOPT_URL, $url);								
+		//$url='http://server.growatt.com/newPlantAPI.do?action=getUserCenterEnertyData';		// 20-08-2023 Updated URL
+ 		//curl_setopt($curl, CURLOPT_URL, $url);		
+		curl_setopt($curl, CURLOPT_URL, DATA_URL);		//We should be logged in by now. Let's attempt to access a password protected page	
 		curl_setopt($curl, CURLOPT_COOKIEJAR, COOKIE_FILE);					
 		curl_setopt($curl, CURLOPT_COOKIEFILE, COOKIE_FILE); 
 		curl_setopt($curl, CURLOPT_USERAGENT, USER_AGENT);					
@@ -143,15 +144,22 @@ function retrieve_growatt_data($command)
 		if ($continue) {
 
 			$data = json_decode($result, JSON_PRETTY_PRINT);
-			$nowpower = (float)str_ireplace('kWh', '', $data['powerValue']);
-			$todaypower = (float)str_ireplace('kWh', '', $data['totalStr']);		// 18-04-2020
 			
-			$str=( $nowpower.';'. $todaypower * 1000 );	#times 1000 to convert the 0.1kWh to 100 WattHour and to convert 2.1kWh to 2100 WattHour
-			lg('Growatt Inverter: '. $nowpower.' for domoticz: '.$str);
-			ud(DOMOTICZDEVICE,0,$str,'GrowattInverter: Generation updated');
+			if(!empty($data['todayStr']) && !empty($data['totalValue'])) {
+			
+				if lg('Growatt inverter: I did find JSON data to work with!');
+				$nowpower = (float)$data['powerValue'];
+				$todaypower = (float)$data['todayValue'];	// kWH			
+				$allpower = (float)$data['totalValue'];		// [totalStr] => 1505.4kWh	[totalValue] => 1505.4
+    				$allpower = $allpower*1000;			// Convert to Wh	
+
+				$str=( $nowpower.';'. $allpower );	#times 1000 to convert the 0.1kWh to 100 WattHour and to convert 2.1kWh to 2100 WattHour
+				lg('Growatt Inverter: '. $nowpower.' for domoticz: '.$str);
+				ud(DOMOTICZDEVICE,0,$str,'GrowattInverter: Generation updated');
+			}
 		}
-	}
-}	
+	}	
+}
 
 
 function lg($msg)   // Can be used to write loglines to separate file or to internal domoticz log. Check settings.php for value.
