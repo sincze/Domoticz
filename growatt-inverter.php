@@ -151,7 +151,7 @@ function retrieve_growatt_data($command)
     				$allpower = $allpower*1000;			// Convert to Wh	
 
 				$str=( $nowpower.';'. $allpower );	#times 1000 to convert the 0.1kWh to 100 WattHour and to convert 2.1kWh to 2100 WattHour
-				lg('Growatt Inverter: '. $nowpower.' for domoticz: '.$str);
+				lg('Growatt Inverter: '.$nowpower.' Watt. Today: '.$todaypower.' kWH and total inverter is: '.$allpower.' Wh for domoticz: '.$str);
 				ud(DOMOTICZDEVICE,0,$str,'GrowattInverter: Generation updated');
 			}
 		}
