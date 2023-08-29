@@ -111,10 +111,7 @@ function retrieve_growatt_data($command)
 
 	if ($continue) {
 
-		$curl = curl_init();
-		//$url='http://server-api.growatt.com/newPlantAPI.do?action=getUserCenterEnertyData';
-		//$url='http://server.growatt.com/newPlantAPI.do?action=getUserCenterEnertyData';		// 20-08-2023 Updated URL
- 		//curl_setopt($curl, CURLOPT_URL, $url);		
+		$curl = curl_init();	
 		curl_setopt($curl, CURLOPT_URL, DATA_URL);		//We should be logged in by now. Let's attempt to access a password protected page	
 		curl_setopt($curl, CURLOPT_COOKIEJAR, COOKIE_FILE);					
 		curl_setopt($curl, CURLOPT_COOKIEFILE, COOKIE_FILE); 
@@ -147,7 +144,7 @@ function retrieve_growatt_data($command)
 			
 			if(!empty($data['todayStr']) && !empty($data['totalValue'])) {
 			
-				if lg('Growatt inverter: I did find JSON data to work with!');
+				lg('Growatt inverter: I did find JSON data to work with!');
 				$nowpower = (float)$data['powerValue'];
 				$todaypower = (float)$data['todayValue'];	// kWH			
 				$allpower = (float)$data['totalValue'];		// [totalStr] => 1505.4kWh	[totalValue] => 1505.4
